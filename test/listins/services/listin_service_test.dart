@@ -15,8 +15,11 @@ import "listin_service_test.mocks.dart";
 ])
 void main() {
   group("getListins:", () {
-    test("O método deve retornar uma lista de Listin", () {
-      MockFirebaseFirestore mockFirestore = MockFirebaseFirestore();
+    late MockFirebaseFirestore mockFirestore;
+    late String uid;
+
+    setUp(() {
+      mockFirestore = MockFirebaseFirestore();
 
       MockQuerySnapshot<Map<String, dynamic>> mockSnapshot =
           MockQuerySnapshot();
@@ -30,7 +33,7 @@ void main() {
       MockQueryDocumentSnapshot<Map<String, dynamic>> mockDoc002 =
           MockQueryDocumentSnapshot();
 
-      String uid = "MEU_UID";
+      uid = "MEU_UID";
 
       Listin listin001 = Listin(
         id: "ID001",
@@ -53,11 +56,16 @@ void main() {
       when(mockCollection.get()).thenAnswer((_) async => mockSnapshot);
 
       when(mockFirestore.collection(uid)).thenReturn(mockCollection);
+    });
 
+    test("O método deve retornar uma lista de Listin", () async {
       ListinService listinService = ListinService(
         firestore: mockFirestore,
         uid: uid,
       );
+
+      List<Listin> result = await listinService.getListins();
+      expect(result.length, 2);
     });
   });
 }
