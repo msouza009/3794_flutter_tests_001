@@ -18,6 +18,13 @@ void main() {
         price: 2.5,
       );
 
+      checkboxTap({
+        required Product product,
+        required String listinId,
+      }) {
+        product.isPurchased = !product.isPurchased;
+      }
+
       await widgetTester.pumpWidget(MaterialApp(
         home: Scaffold(
           body: ListView(
@@ -26,7 +33,7 @@ void main() {
                 listinId: "LISTIN_ID",
                 product: product,
                 onTap: () {},
-                onCheckboxTap: () {},
+                onCheckboxTap: checkboxTap,
                 onTrailButtonTap: () {},
               )
             ],
