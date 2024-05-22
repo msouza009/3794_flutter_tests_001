@@ -47,6 +47,14 @@ void main() {
 
       Text textSubtitle = widgetTester.widget<Text>(findSubtitle);
       expect(textSubtitle.data, equals("R\$ ${product.price!}"));
+
+      await widgetTester.tap(findCheckbox);
+      await widgetTester.pumpAndSettle();
+
+      expect(
+        widgetTester.widget<Checkbox>(findCheckbox).value,
+        product.isPurchased,
+      );
     },
   );
 }
