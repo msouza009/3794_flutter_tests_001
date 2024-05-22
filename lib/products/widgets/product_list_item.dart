@@ -55,6 +55,7 @@ class _ProductListItemState extends State<ProductListItem> {
         (widget.product.price == null)
             ? "Clique para adicionar preço"
             : "R\$ ${widget.product.price!}",
+        key: const Key("subtitle"),
       ),
     );
   }

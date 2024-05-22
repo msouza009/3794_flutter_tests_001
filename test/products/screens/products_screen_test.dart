@@ -33,6 +33,12 @@ void main() {
           ),
         ),
       ));
+
+      Finder findCheckbox = find.byType(Checkbox);
+      Finder findDelete = find.widgetWithIcon(IconButton, Icons.delete);
+      Finder findTitle =
+          find.text("${product.name} (x${product.amount!.toInt()})");
+      Finder findSubtitle = find.byKey(const Key("subtitle"));
     },
   );
 }
