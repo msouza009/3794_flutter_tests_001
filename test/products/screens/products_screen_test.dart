@@ -18,7 +18,7 @@ void main() {
         price: 2.5,
       );
 
-      widgetTester.pumpWidget(MaterialApp(
+      await widgetTester.pumpWidget(MaterialApp(
         home: Scaffold(
           body: ListView(
             children: [
@@ -39,6 +39,14 @@ void main() {
       Finder findTitle =
           find.text("${product.name} (x${product.amount!.toInt()})");
       Finder findSubtitle = find.byKey(const Key("subtitle"));
+
+      expect(findCheckbox, findsOne);
+      expect(findSubtitle, findsOne);
+      expect(findTitle, findsOne);
+      expect(findDelete, findsOne);
+
+      Text textSubtitle = widgetTester.widget<Text>(findSubtitle);
+      expect(textSubtitle.data, equals("R\$ ${product.price!}"));
     },
   );
 }
