@@ -10,4 +10,32 @@ void main() {
 
     expect(result, 0);
   });
+
+  test(
+    "Se a lista tiver apenas um produto, retornar a multiplicação dos valores",
+    () {
+      List<Product> listProducts = [];
+
+      Product product = Product(
+        id: "id",
+        name: "Desinfetante",
+        obs: "obs",
+        category: "",
+        isKilograms: false,
+        isPurchased: true,
+        price: 5,
+        amount: 2,
+      );
+
+      listProducts.add(product);
+
+      expect(
+        calculateTotalPriceFromListProduct(listProducts),
+        product.amount! *
+            product.price!, // + 1, // Descomente para testar o reason
+        reason:
+            "Espera-se que a função leve em consideração não apenas no valor mas a quantidade do item.",
+      );
+    },
+  );
 }
