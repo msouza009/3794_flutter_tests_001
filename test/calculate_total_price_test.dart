@@ -62,4 +62,47 @@ void main() {
     },
     retry: 1000000,
   );
+
+  test(
+    "A função deve levantar uma exceção caso um dos produtos não esteja no carrinho.",
+    () {
+      List<Product> listProducts = [
+        Product(
+          id: "id",
+          name: "Cenoura",
+          obs: "obs",
+          category: "category",
+          isKilograms: false,
+          isPurchased: true,
+          amount: Random().nextInt(10).toDouble(),
+          price: Random().nextDouble() * 10,
+        ),
+        Product(
+          id: "id",
+          name: "Cenoura",
+          obs: "obs",
+          category: "category",
+          isKilograms: false,
+          isPurchased: true,
+          amount: Random().nextInt(10).toDouble(),
+          price: Random().nextDouble() * 10,
+        ),
+        Product(
+          id: "id",
+          name: "Cenoura",
+          obs: "obs",
+          category: "category",
+          isKilograms: false,
+          isPurchased: false,
+          amount: Random().nextInt(10).toDouble(),
+          price: Random().nextDouble() * 10,
+        ),
+      ];
+
+      expect(
+        () => calculateTotalPriceFromListProduct(listProducts),
+        throwsA(isA<ProductNotPurchasedException>()),
+      );
+    },
+  );
 }
