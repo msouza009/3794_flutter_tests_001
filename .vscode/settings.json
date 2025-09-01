@@ -1,6 +1,7 @@
 {
-    "cSpell.language": "pt,en",
-    "cSpell.enableFiletypes": [
-        "dart"
-    ]
+  "cSpell.language": "pt,en",
+  "cSpell.enableFiletypes": [
+    "dart"
+  ],
+  "dart.flutterSdkPath": ".fvm/versions/3.19.6"
 }
