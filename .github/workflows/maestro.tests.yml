@@ -13,22 +13,36 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 1️⃣ Pegar o código do repositório
       - name: Checkout code
         uses: actions/checkout@v3
 
+      # 2️⃣ Instalar Flutter
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.13.0'
+          flutter-version: '3.13.0'  # versão compatível com seu Dart >=3.3.4
 
+      # 3️⃣ Forçar upgrade do Flutter
+      - name: Upgrade Flutter
+        run: flutter upgrade
+
+      # 4️⃣ Instalar Maestro CLI
       - name: Install Maestro
         run: curl -Ls "https://get.maestro.mobile.dev" | bash
 
+      # 5️⃣ Atualizar PATH para Maestro
+      - name: Set Maestro Path
+        run: echo "$HOME/.maestro/bin" >> $GITHUB_PATH
+
+      # 6️⃣ Instalar dependências do Flutter
       - name: Get Flutter dependencies
         run: flutter pub get
 
+      # 7️⃣ Build do APK release
       - name: Build release APK
         run: flutter build apk --release
 
+      # 8️⃣ Rodar fluxos Maestro
       - name: Run Maestro tests
         run: maestro test build/app/outputs/flutter-apk/app-release.apk test/flows/
