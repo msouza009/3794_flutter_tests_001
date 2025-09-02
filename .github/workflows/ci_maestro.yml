@@ -21,7 +21,7 @@ jobs:
           flutter-version: '3.19.6'
           channel: 'stable'
 
-      - name: Configurar o Emulador Android
+      - name: Rodar os testes no Android Emulator
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 33
@@ -29,12 +29,12 @@ jobs:
           arch: x86_64
           profile: pixel_3
           emulator-build: 10424075
-
-      - name: Compilar o APK de release
-        run: flutter build apk --release
-
-      - name: Instalar o Maestro
-        run: curl -Ls "https://install.maestro.mobile.dev" | bash
-
-      - name: Rodar os testes do Maestro
-        run: $HOME/.maestro/bin/maestro test test/flows/login.yaml
+          script: |
+            # Instalar o Maestro
+            curl -Ls "https://install.maestro.mobile.dev" | bash
+            
+            # Compilar o APK de release
+            flutter build apk --release
+            
+            # Rodar os testes do Maestro
+            $HOME/.maestro/bin/maestro test test/flows/login.yaml
