@@ -1,0 +1,9 @@
+appId: lima.ricarth.flutter_listin
+---
+- launchApp:
+    clearState: true
+- tapOn: "E-mail"
+- inputText: "msouza@gmail.com"
+- tapOn: "Senha"
+- inputText: "12345678"
+- tapOn: "Entrar"

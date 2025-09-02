@@ -9,8 +9,6 @@ on:
 jobs:
   maestro-tests:
     runs-on: ubuntu-latest
-    env:
-      HAS_GOOGLE_JSON: ${{ github.secret.GOOGLE_SERVICES_JSON != '' }}
 
     steps:
       - name: Checkout repository
@@ -29,16 +27,16 @@ jobs:
           curl -Ls "https://get.maestro.mobile.dev" | bash
           echo "$HOME/.maestro/bin" >> $GITHUB_PATH
 
-      # Configura google-services.json somente se existir
+      # Configura google-services.json somente se o segredo existir
       - name: Set up google-services.json
-        if: env.HAS_GOOGLE_JSON == 'true'
-        run: echo '${{ secrets.GOOGLE_SERVICES_JSON }}' > android/app/google-services.json
+        if: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        run: echo "${{ secrets.GOOGLE_SERVICES_JSON }}" > android/app/google-services.json
 
       - name: Build Flutter APK (debug)
         run: flutter build apk --debug
 
       - name: Build Flutter APK (release)
-        if: env.HAS_GOOGLE_JSON == 'true'
+        if: ${{ secrets.GOOGLE_SERVICES_JSON }}
         run: flutter build apk --release
 
       - name: Run Maestro Tests
@@ -47,7 +45,7 @@ jobs:
           if [ -f build/app/outputs/flutter-apk/app-release.apk ]; then
             APK_PATH="build/app/outputs/flutter-apk/app-release.apk"
           fi
-          maestro test .maestro --app $APK_PATH --format junit --output results.xml
+          maestro test .maestro "$APK_PATH" --format junit --output results.xml
 
       - name: Upload Maestro Test Results
         uses: actions/upload-artifact@v4
