@@ -11,52 +11,51 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Pega o código do repositório
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # 2️⃣ Configura Flutter
+      - name: Set up Java (necessário para Android SDK)
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v2
+        with:
+          api-level: 33
+          build-tools: '33.0.0'
+          emulator: true
+          system-images: 'google_apis;x86_64'
+
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.22.0'
 
-      # 3️⃣ Instala dependências Flutter
       - name: Get Flutter dependencies
         run: flutter pub get
 
-      # 4️⃣ Instala Maestro CLI
       - name: Install Maestro CLI
         run: |
           curl -Ls "https://get.maestro.mobile.dev" | bash
           echo "$HOME/.maestro/bin" >> $GITHUB_PATH
 
-      # 5️⃣ Instala ferramentas do Android SDK
-      - name: Install Android SDK packages
-        run: |
-          yes | sdkmanager "platform-tools" "emulator" "platforms;android-33" "system-images;android-33;google_apis;x86_64"
-
-      # 6️⃣ Cria o emulador
       - name: Create Android Emulator
-        run: |
-          echo "no" | avdmanager create avd -n test -k "system-images;android-33;google_apis;x86_64" --force
+        run: echo "no" | avdmanager create avd -n test -k "system-images;android-33;google_apis;x86_64" --force
 
-      # 7️⃣ Inicia o emulador
       - name: Start Android Emulator
         run: |
           $ANDROID_HOME/emulator/emulator -avd test -no-window -no-audio &
           adb wait-for-device
-          adb shell input keyevent 82 # desbloqueia a tela
+          adb shell input keyevent 82
 
-      # 8️⃣ Build Flutter APK (debug)
       - name: Build Flutter APK (debug)
         run: flutter build apk --debug
 
-      # 9️⃣ Build Flutter APK (release)
       - name: Build Flutter APK (release)
         run: flutter build apk --release
 
-      # 🔟 Run Maestro Tests
       - name: Run Maestro Tests
         run: |
           APK_PATH="build/app/outputs/flutter-apk/app-debug.apk"
@@ -65,7 +64,6 @@ jobs:
           fi
           maestro test test/flows --format junit --output results.xml
 
-      # 1️⃣1️⃣ Upload results
       - name: Upload Maestro Test Results
         uses: actions/upload-artifact@v4
         with:
