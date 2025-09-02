@@ -28,5 +28,4 @@ jobs:
         run: curl -Ls "https://install.maestro.mobile.dev" | bash
 
       - name: Rodar os testes do Maestro no Android
-        run: $HOME/.maestro/bin/maestro test
-        working-directory: .
+        run: $HOME/.maestro/bin/maestro test test/flows/login.yaml
