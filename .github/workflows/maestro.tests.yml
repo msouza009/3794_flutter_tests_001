@@ -19,7 +19,7 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.19.6' # versão com Dart >=3.3.4
+          flutter-version: '3.19.6'
 
       - name: Install Maestro
         run: curl -Ls "https://get.maestro.mobile.dev" | bash
@@ -27,24 +27,29 @@ jobs:
       - name: Set Maestro Path
         run: echo "$HOME/.maestro/bin" >> $GITHUB_PATH
 
-      - name: Create google-services.json
-        run: |
-          echo "${{ secrets.GOOGLE_SERVICES_JSON }}" > android/app/google-services.json
-
       - name: Get Flutter dependencies
         run: flutter pub get
-
-      - name: Start Android Emulator
-        env:
-          ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
-        run: |
-          echo "no" | avdmanager create avd -n test -k "system-images;android-33;google_apis;x86_64" --device "pixel"
-          $ANDROID_SDK_ROOT/emulator/emulator -avd test -no-window -no-audio &
-          adb wait-for-device
-          adb shell input keyevent 82
 
       - name: Build release APK
         run: flutter build apk --release
 
-      - name: Run Maestro tests
-        run: maestro test build/app/outputs/flutter-apk/app-release.apk test/flows/
+      - name: Run Maestro Tests Locally
+        run: |
+          echo "Running Maestro tests on local emulator..."
+          # criar emulador se não existir
+          echo "no" | avdmanager create avd -n test -k "system-images;android-33;google_apis;x86_64" --device "pixel" || true
+          $ANDROID_SDK_ROOT/emulator/emulator -avd test -no-window -no-audio &
+          adb wait-for-device
+          adb shell input keyevent 82
+          maestro test build/app/outputs/flutter-apk/app-release.apk test/flows/
+
+      - name: Conditional Firebase Test Lab (if google-services.json exists)
+        if: ${{ secrets.GOOGLE_SERVICES_JSON != '' }}
+        run: |
+          echo "${{ secrets.GOOGLE_SERVICES_JSON }}" > android/app/google-services.json
+          gcloud config set project flutterlistin-28e3a
+          gcloud firebase test android run \
+            --type instrumentation \
+            --app build/app/outputs/flutter-apk/app-release.apk \
+            --device model=Pixel2,version=33,locale=en,orientation=portrait \
+            --test path/to/your_test.apk
