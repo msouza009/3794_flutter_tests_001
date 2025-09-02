@@ -19,13 +19,24 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.19.6' # versão com Dart >=3.3.4
+          flutter-version: '3.19.6'
 
       - name: Install Maestro
         run: curl -Ls "https://get.maestro.mobile.dev" | bash
 
       - name: Set Maestro Path
         run: echo "$HOME/.maestro/bin" >> $GITHUB_PATH
+
+      - name: Install Android SDK
+        uses: android-actions/setup-android@v2
+        with:
+          api-level: 33
+          target: google_apis
+          arch: x86_64
+          build-tools: 33.0.2
+
+      - name: Accept Android Licenses
+        run: yes | sdkmanager --licenses
 
       - name: Create google-services.json
         run: |
@@ -36,9 +47,9 @@ jobs:
 
       - name: Start Android Emulator
         env:
-          ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+          ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
         run: |
-          echo "no" | avdmanager create avd -n test -k "system-images;android-33;google_apis;x86_64" --device "pixel"
+          echo "no" | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/avdmanager create avd -n test -k "system-images;android-33;google_apis;x86_64" --device "pixel"
           $ANDROID_SDK_ROOT/emulator/emulator -avd test -no-window -no-audio &
           adb wait-for-device
           adb shell input keyevent 82
