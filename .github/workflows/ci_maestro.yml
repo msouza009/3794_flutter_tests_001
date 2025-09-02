@@ -27,7 +27,6 @@ jobs:
           curl -Ls "https://get.maestro.mobile.dev" | bash
           echo "$HOME/.maestro/bin" >> $GITHUB_PATH
 
-      # Configura google-services.json somente se o segredo existir
       - name: Set up google-services.json
         if: ${{ secrets.GOOGLE_SERVICES_JSON }}
         run: echo "${{ secrets.GOOGLE_SERVICES_JSON }}" > android/app/google-services.json
