@@ -21,11 +21,11 @@ jobs:
 
       - name: Build Debug APK
         run: ./gradlew assembleDebug
-        working-directory: android # <-- Adicione esta linha para mudar o diretório de trabalho
+        working-directory: android # <-- Adicione esta linha
 
       - name: Run Maestro tests on Maestro Cloud
         uses: mobile-dev-inc/action-maestro-cloud@v1
         with:
           api-key: ${{ secrets.MAESTRO_API_KEY }}
           project-id: ${{ secrets.MAESTRO_PROJECT_ID }}
-          app-file: android/app/build/outputs/apk/debug/app-debug.apk # <-- Altere o caminho do arquivo APK
+          app-file: android/app/build/outputs/apk/debug/app-debug.apk # <-- Ajuste este caminho
