@@ -1,41 +1,30 @@
-name: Testes de UI com Maestro
+name: Build and run Maestro tests (Native Android)
 
 on:
-  pull_request:
-    branches:
-      - main
   push:
-    branches:
-      - main
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
-  build-and-test:
+  maestro-cloud:
     runs-on: ubuntu-latest
+    
     steps:
-      - name: Checkout do código
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-      - name: Configurar o Flutter
-        uses: subosito/flutter-action@v2
+      - name: Set up Java
+        uses: actions/setup-java@v3
         with:
-          flutter-version: '3.19.6'
-          channel: 'stable'
+          java-version: 11
+          distribution: 'temurin'
 
-      - name: Rodar os testes no Android Emulator
-        uses: reactivecircus/android-emulator-runner@v2
+      - name: Build Debug APK
+        run: ./gradlew assembleDebug
+
+      - name: Run Maestro tests on Maestro Cloud
+        uses: mobile-dev-inc/action-maestro-cloud@v1
         with:
-          api-level: 33
-          target: google_apis
-          arch: x86_64
-          profile: pixel_3
-          # Adicionar 'accel: off' para desabilitar a aceleração de hardware
-          accel: off
-          script: |
-            # Instalar o Maestro
-            curl -Ls "https://install.maestro.mobile.dev" | bash
-
-            # Compilar o APK de release
-            flutter build apk --release
-
-            # Rodar os testes do Maestro
-            $HOME/.maestro/bin/maestro test test/flows/login.yaml
+          api-key: ${{ secrets.MAESTRO_API_KEY }}
+          project-id: ${{ secrets.MAESTRO_PROJECT_ID }}
+          app-file: app/build/outputs/apk/debug/app-debug.apk
