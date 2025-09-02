@@ -27,15 +27,16 @@ jobs:
           curl -Ls "https://get.maestro.mobile.dev" | bash
           echo "$HOME/.maestro/bin" >> $GITHUB_PATH
 
+      # Passo opcional para google-services.json
       - name: Set up google-services.json
-        if: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        if: ${{ github.event_name == 'push' && github.repository && secrets.GOOGLE_SERVICES_JSON != '' }}
         run: echo "${{ secrets.GOOGLE_SERVICES_JSON }}" > android/app/google-services.json
 
       - name: Build Flutter APK (debug)
         run: flutter build apk --debug
 
       - name: Build Flutter APK (release)
-        if: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        if: ${{ secrets.GOOGLE_SERVICES_JSON != '' }}
         run: flutter build apk --release
 
       - name: Run Maestro Tests
