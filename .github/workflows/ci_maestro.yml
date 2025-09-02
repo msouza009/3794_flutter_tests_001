@@ -1,31 +1,40 @@
-name: Testes de UI com Maestro - Android
+name: Testes de UI com Maestro
 
 on:
   pull_request:
     branches:
       - main
+  push:
+    branches:
+      - main
 
 jobs:
-  maestro_android_tests:
+  build-and-test:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout do código
         uses: actions/checkout@v3
 
-      - name: Configurar o Flutter com a versão 3.19.6
+      - name: Configurar o Flutter
         uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.19.6'
+          channel: 'stable'
 
-      - name: Instalar dependências do Flutter
-        run: flutter pub get
+      - name: Configurar o Emulador Android
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 33
+          target: google_apis
+          arch: x86_64
+          profile: pixel_3
+          emulator-build: 10424075
 
-      - name: Construir o APK (release)
+      - name: Compilar o APK de release
         run: flutter build apk --release
 
       - name: Instalar o Maestro
         run: curl -Ls "https://install.maestro.mobile.dev" | bash
 
-      - name: Rodar os testes do Maestro no Android
+      - name: Rodar os testes do Maestro
         run: $HOME/.maestro/bin/maestro test test/flows/login.yaml
