@@ -28,8 +28,8 @@ jobs:
           target: google_apis
           arch: x86_64
           profile: pixel_3
-          # Remova a linha abaixo para usar a última versão do emulador
-          # emulator-build: 10424075
+          # Adicionar 'accel: off' para desabilitar a aceleração de hardware
+          accel: off
           script: |
             # Instalar o Maestro
             curl -Ls "https://install.maestro.mobile.dev" | bash
