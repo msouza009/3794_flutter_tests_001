@@ -19,7 +19,7 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.22.0' # altere para a versão que você usa
+          flutter-version: '3.22.0'
 
       # 3️⃣ Instala dependências Flutter
       - name: Get Flutter dependencies
@@ -31,21 +31,21 @@ jobs:
           curl -Ls "https://get.maestro.mobile.dev" | bash
           echo "$HOME/.maestro/bin" >> $GITHUB_PATH
 
-      ############# Build APKs #############
-      # Build debug (sempre)
-      - name: Build Flutter APK (debug)
-        run: flutter build apk --debug
-
-      # Build release só se o segredo do Firebase estiver configurado
+      # 5️⃣ Configura google-services.json para release (se existir)
       - name: Set up google-services.json
         if: secrets.GOOGLE_SERVICES_JSON != ''
         run: echo '${{ secrets.GOOGLE_SERVICES_JSON }}' > android/app/google-services.json
 
+      # 6️⃣ Build Flutter APK Debug (funciona mesmo sem Firebase)
+      - name: Build Flutter APK (debug)
+        run: flutter build apk --debug
+
+      # 7️⃣ Build Flutter APK Release (só se o google-services.json existir)
       - name: Build Flutter APK (release)
         if: secrets.GOOGLE_SERVICES_JSON != ''
         run: flutter build apk --release
 
-      ############# Run Maestro Tests #############
+      # 8️⃣ Run Maestro Tests
       - name: Run Maestro Tests
         run: |
           APK_PATH="build/app/outputs/flutter-apk/app-debug.apk"
@@ -54,7 +54,7 @@ jobs:
           fi
           maestro test .maestro --app $APK_PATH --format junit --output results.xml
 
-      ############# Upload Results #############
+      # 9️⃣ Upload Maestro Test Results
       - name: Upload Maestro Test Results
         uses: actions/upload-artifact@v4
         with:
