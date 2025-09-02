@@ -1,0 +1,32 @@
+name: Testes de UI com Maestro - Android
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  maestro_android_tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v3
+
+      - name: Configurar o Flutter com a versão 3.19.6
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.19.6'
+
+      - name: Instalar dependências do Flutter
+        run: flutter pub get
+
+      - name: Construir o APK (release)
+        run: flutter build apk --release
+
+      - name: Instalar o Maestro
+        run: curl -Ls "https://install.maestro.mobile.dev" | bash
+
+      - name: Rodar os testes do Maestro no Android
+        run: $HOME/.maestro/bin/maestro test
+        working-directory: .
