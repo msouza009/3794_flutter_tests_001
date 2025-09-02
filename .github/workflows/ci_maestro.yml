@@ -1,31 +1,27 @@
-name: Build and run Maestro tests (Native Android)
+name: Run Maestro Tests
 
 on:
-  push:
-    branches: [ main ]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
-  maestro-cloud:
-    runs-on: ubuntu-latest
-    
+  maestro-tests:
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v3
 
-      - name: Set up Java
+      - name: Install Java
         uses: actions/setup-java@v3
         with:
-          java-version: 11
           distribution: 'temurin'
+          java-version: '17'
 
-      - name: Build Debug APK
-        run: ./gradlew assembleDebug
-        working-directory: android # <-- Esta linha corrige o erro
+      - name: Install Maestro
+        run: brew install maestro
 
-      - name: Run Maestro tests on Maestro Cloud
-        uses: mobile-dev-inc/action-maestro-cloud@v1
-        with:
-          api-key: ${{ secrets.MAESTRO_API_KEY }}
-          project-id: ${{ secrets.MAESTRO_PROJECT_ID }}
-          app-file: android/app/build/outputs/apk/debug/app-debug.apk # <-- Altere o caminho do arquivo
+      - name: Start emulator (Android ou iOS)
+        run: |
+          # scripts para iniciar emulador e aguardar
+
+      - name: Run Maestro Flows
+        run: maestro test .maestro/*.yaml
