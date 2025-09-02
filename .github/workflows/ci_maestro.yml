@@ -31,15 +31,22 @@ jobs:
           curl -Ls "https://get.maestro.mobile.dev" | bash
           echo "$HOME/.maestro/bin" >> $GITHUB_PATH
 
-      # 5️⃣ Build Flutter APK (Debug, caso queira testar sem Firebase)
+      # 5️⃣ Configura google-services.json para release (Firebase)
+      - name: Set up google-services.json
+        if: secrets.GOOGLE_SERVICES_JSON != ''
+        run: |
+          mkdir -p android/app
+          echo '${{ secrets.GOOGLE_SERVICES_JSON }}' > android/app/google-services.json
+
+      # 6️⃣ Build Flutter APK (debug)
       - name: Build Flutter APK (debug)
         run: flutter build apk --debug
 
-      # 6️⃣ Build Flutter APK (Release)
+      # 7️⃣ Build Flutter APK (release)
       - name: Build Flutter APK (release)
         run: flutter build apk --release
 
-      # 7️⃣ Run Maestro Tests
+      # 8️⃣ Run Maestro Tests
       - name: Run Maestro Tests
         run: |
           APK_PATH="build/app/outputs/flutter-apk/app-debug.apk"
@@ -48,7 +55,7 @@ jobs:
           fi
           maestro test .maestro --app $APK_PATH --format junit --output results.xml
 
-      # 8️⃣ Upload results
+      # 9️⃣ Upload results
       - name: Upload Maestro Test Results
         uses: actions/upload-artifact@v4
         with:

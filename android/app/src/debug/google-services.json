@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "307742403783",
+    "project_id": "flutterlistin-28e3a",
+    "storage_bucket": "flutterlistin-28e3a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:307742403783:android:27e3e3ee2dd9c6d348a2e2",
+        "android_client_info": {
+          "package_name": "com.example.flutter_tests_001"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDgD6k2IgaHF9CqcYfUWgub_rTyrfoLDRI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:307742403783:android:0dd084d9bade5b9748a2e2",
+        "android_client_info": {
+          "package_name": "lima.ricarth.flutter_listin"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDgD6k2IgaHF9CqcYfUWgub_rTyrfoLDRI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
