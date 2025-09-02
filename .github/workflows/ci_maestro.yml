@@ -8,30 +8,56 @@ on:
 
 jobs:
   maestro-tests:
-    runs-on: ubuntu-latest # pode ser macos-latest também
+    runs-on: ubuntu-latest
 
     steps:
+      # 1️⃣ Pega o código do repositório
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      # 2️⃣ Configura Flutter
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.22.0' # coloque a versão que você usa no projeto
+          flutter-version: '3.22.0' # ou a versão que você usa
 
+      # 3️⃣ Instala dependências
+      - name: Get Flutter dependencies
+        run: flutter pub get
+
+      # 4️⃣ Instala Maestro CLI
       - name: Install Maestro CLI
         run: |
           curl -Ls "https://get.maestro.mobile.dev" | bash
           echo "$HOME/.maestro/bin" >> $GITHUB_PATH
 
-      - name: Build Flutter APK
+      ############# OPCIONAL: Build Release com Firebase #################
+      # 5️⃣ Coloca google-services.json (apenas se precisar do Firebase)
+      - name: Set up google-services.json
+        if: secrets.GOOGLE_SERVICES_JSON != ''
+        run: echo '${{ secrets.GOOGLE_SERVICES_JSON }}' > android/app/google-services.json
+
+      # 6️⃣ Build APK
+      # Para debug (não precisa do Firebase real)
+      - name: Build Flutter APK (debug)
+        if: secrets.GOOGLE_SERVICES_JSON == ''
+        run: flutter build apk --debug
+
+      # Para release (usa google-services.json)
+      - name: Build Flutter APK (release)
+        if: secrets.GOOGLE_SERVICES_JSON != ''
         run: flutter build apk --release
 
+      # 7️⃣ Run Maestro Tests
       - name: Run Maestro Tests
-        run: maestro test .maestro \
-          --app build/app/outputs/flutter-apk/app-release.apk \
-          --format junit --output results.xml
+        run: |
+          APK_PATH="build/app/outputs/flutter-apk/app-debug.apk"
+          if [ -f build/app/outputs/flutter-apk/app-release.apk ]; then
+            APK_PATH="build/app/outputs/flutter-apk/app-release.apk"
+          fi
+          maestro test .maestro --app $APK_PATH --format junit --output results.xml
 
+      # 8️⃣ Upload results
       - name: Upload Maestro Test Results
         uses: actions/upload-artifact@v4
         with:
