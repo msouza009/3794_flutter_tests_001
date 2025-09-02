@@ -12,6 +12,9 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
 
+    env:
+      ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -34,9 +37,14 @@ jobs:
           target: google_apis
           arch: x86_64
           build-tools: 33.0.2
+          cmake: false
+          ndk: false
 
-      - name: Accept Android Licenses
+      - name: Accept Android SDK licenses
         run: yes | sdkmanager --licenses
+
+      - name: Install Android System Image
+        run: yes | sdkmanager "system-images;android-33;google_apis;x86_64"
 
       - name: Create google-services.json
         run: |
@@ -45,9 +53,7 @@ jobs:
       - name: Get Flutter dependencies
         run: flutter pub get
 
-      - name: Start Android Emulator
-        env:
-          ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
+      - name: Create and start Android Emulator
         run: |
           echo "no" | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/avdmanager create avd -n test -k "system-images;android-33;google_apis;x86_64" --device "pixel"
           $ANDROID_SDK_ROOT/emulator/emulator -avd test -no-window -no-audio &
