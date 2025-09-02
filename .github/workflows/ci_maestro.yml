@@ -28,13 +28,14 @@ jobs:
           target: google_apis
           arch: x86_64
           profile: pixel_3
-          emulator-build: 10424075
+          # Remova a linha abaixo para usar a última versão do emulador
+          # emulator-build: 10424075
           script: |
             # Instalar o Maestro
             curl -Ls "https://install.maestro.mobile.dev" | bash
-            
+
             # Compilar o APK de release
             flutter build apk --release
-            
+
             # Rodar os testes do Maestro
             $HOME/.maestro/bin/maestro test test/flows/login.yaml
