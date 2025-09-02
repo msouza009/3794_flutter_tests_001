@@ -1,10 +1,10 @@
 name: CI Maestro
 
 on:
-  pull_request:
-    branches: [main]
   push:
-    branches: [main]
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
 
 jobs:
   maestro-tests:
@@ -19,9 +19,9 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.22.0' # ou a versão que você usa
+          flutter-version: '3.22.0' # altere para a versão que você usa
 
-      # 3️⃣ Instala dependências
+      # 3️⃣ Instala dependências Flutter
       - name: Get Flutter dependencies
         run: flutter pub get
 
@@ -31,21 +31,12 @@ jobs:
           curl -Ls "https://get.maestro.mobile.dev" | bash
           echo "$HOME/.maestro/bin" >> $GITHUB_PATH
 
-      ############# OPCIONAL: Build Release com Firebase #################
-      # 5️⃣ Coloca google-services.json (apenas se precisar do Firebase)
-      - name: Set up google-services.json
-        if: secrets.GOOGLE_SERVICES_JSON != ''
-        run: echo '${{ secrets.GOOGLE_SERVICES_JSON }}' > android/app/google-services.json
-
-      # 6️⃣ Build APK
-      # Para debug (não precisa do Firebase real)
+      # 5️⃣ Build Flutter APK (Debug, caso queira testar sem Firebase)
       - name: Build Flutter APK (debug)
-        if: secrets.GOOGLE_SERVICES_JSON == ''
         run: flutter build apk --debug
 
-      # Para release (usa google-services.json)
+      # 6️⃣ Build Flutter APK (Release)
       - name: Build Flutter APK (release)
-        if: secrets.GOOGLE_SERVICES_JSON != ''
         run: flutter build apk --release
 
       # 7️⃣ Run Maestro Tests
