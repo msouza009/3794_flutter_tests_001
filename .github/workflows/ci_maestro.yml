@@ -9,9 +9,11 @@ on:
 jobs:
   maestro-tests:
     runs-on: ubuntu-latest
+    env:
+      MAESTRO_CLI_NO_ANALYTICS: 1
 
     steps:
-      # 1️⃣ Pega o código do repositório
+      # 1️⃣ Checkout do código
       - name: Checkout repository
         uses: actions/checkout@v3
 
@@ -31,17 +33,32 @@ jobs:
           curl -Ls "https://get.maestro.mobile.dev" | bash
           echo "$HOME/.maestro/bin" >> $GITHUB_PATH
 
-      # 5️⃣ Build APK (Debug)
-      - name: Build Flutter APK (debug)
+      # 5️⃣ Configura o Android SDK e emulador
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v2
+        with:
+          api-level: 33
+          target: default
+          arch: x86_64
+          force-avd: true
+
+      # 6️⃣ Inicia o emulador
+      - name: Start Android Emulator
+        run: |
+          $ANDROID_HOME/emulator/emulator -avd test -no-window -no-audio &
+          adb wait-for-device
+          adb shell input keyevent 82
+
+      # 7️⃣ Build Flutter APK (Debug)
+      - name: Build Flutter APK
         run: flutter build apk --debug
 
-      # 6️⃣ Executa os testes Maestro
+      # 8️⃣ Run Maestro Tests
       - name: Run Maestro Tests
         run: |
-          APK_PATH="build/app/outputs/flutter-apk/app-debug.apk"
-          maestro test test/flows/login.yaml "$APK_PATH" --format junit --output results.xml
+          maestro test test/flows/login.yaml --format junit --output results.xml
 
-      # 7️⃣ Sobe o resultado como artefato
+      # 9️⃣ Upload resultados
       - name: Upload Maestro Test Results
         uses: actions/upload-artifact@v4
         with:
