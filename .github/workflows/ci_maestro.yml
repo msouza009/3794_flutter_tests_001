@@ -11,42 +11,41 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Pega o código do repositório
+      # 1️⃣ Checkout
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # 2️⃣ Configura Flutter
+      # 2️⃣ Setup Flutter
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.22.0' # altere para a versão que você usa
+          flutter-version: '3.22.0'
 
-      # 3️⃣ Instala dependências Flutter
+      # 3️⃣ Get dependencies
       - name: Get Flutter dependencies
         run: flutter pub get
 
-      # 4️⃣ Instala Maestro CLI
+      # 4️⃣ Install Maestro CLI
       - name: Install Maestro CLI
         run: |
           curl -Ls "https://get.maestro.mobile.dev" | bash
           echo "$HOME/.maestro/bin" >> $GITHUB_PATH
 
-      # 5️⃣ Configura google-services.json para release (Firebase)
-      - name: Set up google-services.json
+      # 5️⃣ Add google-services.json if using Firebase
+      - name: Setup google-services.json
         if: secrets.GOOGLE_SERVICES_JSON != ''
-        run: |
-          mkdir -p android/app
-          echo '${{ secrets.GOOGLE_SERVICES_JSON }}' > android/app/google-services.json
+        run: echo '${{ secrets.GOOGLE_SERVICES_JSON }}' > android/app/google-services.json
 
-      # 6️⃣ Build Flutter APK (debug)
+      # 6️⃣ Build APK
       - name: Build Flutter APK (debug)
+        if: secrets.GOOGLE_SERVICES_JSON == ''
         run: flutter build apk --debug
 
-      # 7️⃣ Build Flutter APK (release)
       - name: Build Flutter APK (release)
+        if: secrets.GOOGLE_SERVICES_JSON != ''
         run: flutter build apk --release
 
-      # 8️⃣ Run Maestro Tests
+      # 7️⃣ Run Maestro tests
       - name: Run Maestro Tests
         run: |
           APK_PATH="build/app/outputs/flutter-apk/app-debug.apk"
@@ -55,7 +54,7 @@ jobs:
           fi
           maestro test .maestro --app $APK_PATH --format junit --output results.xml
 
-      # 9️⃣ Upload results
+      # 8️⃣ Upload results
       - name: Upload Maestro Test Results
         uses: actions/upload-artifact@v4
         with:
