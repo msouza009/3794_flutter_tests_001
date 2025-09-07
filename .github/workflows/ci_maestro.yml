@@ -27,23 +27,42 @@ jobs:
       - name: Build APK
         run: flutter build apk --debug
 
-      # Instalação das dependências do Android
-      - name: Setup Android emulator
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: 31
-          target: google_apis
-          arch: x86_64
-          profile: Nexus 6
-          script: echo "Emulador Android pronto!"
-
       # Instalação do Maestro
       - name: Setup Maestro
         run: |
           curl -Ls "https://get.maestro.mobile.dev" | bash
           echo "$HOME/.maestro/bin" >> $GITHUB_PATH
 
+      # Configuração do emulador Android
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+
+      - name: Create AVD
+        run: |
+          echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager create avd -n test -k "system-images;android-31;google_apis;x86_64" --force
+
+      - name: Start emulator
+        run: |
+          $ANDROID_HOME/emulator/emulator -avd test -no-window -no-audio -no-boot-anim -gpu swiftshader_indirect &
+          adb wait-for-device
+          adb shell input keyevent 82
+
+      - name: Install APK
+        run: |
+          adb install build/app/outputs/flutter-apk/app-debug.apk
+
       # Rodar os testes do Maestro
       - name: Run Maestro tests
         run: |
           maestro test test/flows/login.yaml
+
+      - name: Stop emulator
+        if: always()
+        run: |
+          adb emu kill
