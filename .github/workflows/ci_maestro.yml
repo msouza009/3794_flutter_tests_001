@@ -41,7 +41,11 @@ jobs:
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
-          java-version: '11'
+          java-version: '17'
+
+      - name: Install system image
+        run: |
+          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "system-images;android-31;google_apis;x86_64"
 
       - name: Create AVD
         run: |
@@ -50,7 +54,11 @@ jobs:
       - name: Start emulator
         run: |
           $ANDROID_HOME/emulator/emulator -avd test -no-window -no-audio -no-boot-anim -gpu swiftshader_indirect &
+          echo "Aguardando o emulador inicializar..."
           adb wait-for-device
+          echo "Emulador detectado, aguardando boot completo..."
+          adb shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done'
+          echo "Boot completo, desbloqueando tela..."
           adb shell input keyevent 82
 
       - name: Install APK
